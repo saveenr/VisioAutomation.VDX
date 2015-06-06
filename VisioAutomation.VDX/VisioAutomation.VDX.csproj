@@ -75,6 +75,7 @@
     <Compile Include="Elements\Hyperlink.cs" />
     <Compile Include="Elements\CustomProps.cs" />
     <Compile Include="Elements\Layer.cs" />
+    <Compile Include="Elements\Template.cs" />
     <Compile Include="FaceList.cs" />
     <Compile Include="LayerList.cs" />
     <Compile Include="MasterMetdata.cs" />

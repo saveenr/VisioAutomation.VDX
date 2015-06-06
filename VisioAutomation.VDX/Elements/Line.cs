@@ -2,7 +2,7 @@ using VisioAutomation.VDX.Internal;
 using VA=VisioAutomation;
 using SXL = System.Xml.Linq;
 
-namespace VisioAutomation.VDX.Elements
+namespace VisioAutomation.VDX.Sections
 {
     public class Line
     {
