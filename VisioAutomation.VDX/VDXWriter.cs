@@ -15,12 +15,12 @@ namespace VisioAutomation.VDX
         {
             if (vdoc == null)
             {
-                throw new System.ArgumentNullException("vdoc");
+                throw new System.ArgumentNullException(nameof(vdoc));
             }
 
             if (dom == null)
             {
-                throw new System.ArgumentNullException("dom");
+                throw new System.ArgumentNullException(nameof(dom));
             }
 
             this._ModifyTemplate(dom, vdoc);
@@ -30,7 +30,7 @@ namespace VisioAutomation.VDX
         {
             if (output_filename == null)
             {
-                throw new System.ArgumentNullException("output_filename");
+                throw new System.ArgumentNullException(nameof(output_filename));
             }
 
             // Validate that all Document windows refer to an existing page

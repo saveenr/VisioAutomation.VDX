@@ -13,7 +13,7 @@ namespace VisioAutomation.VDX
         {
             if (func_get_name == null)
             {
-                throw new System.ArgumentNullException("func_get_name");
+                throw new System.ArgumentNullException(nameof(func_get_name));
             }
 
             this.items = new List<T>();
@@ -26,7 +26,7 @@ namespace VisioAutomation.VDX
         {
             if (name == null)
             {
-                throw new System.ArgumentNullException("name");
+                throw new System.ArgumentNullException(nameof(name));
             }
 
             return this.dic.ContainsKey(name);
@@ -36,7 +36,7 @@ namespace VisioAutomation.VDX
         {
             if (item == null)
             {
-                throw new System.ArgumentNullException("item");
+                throw new System.ArgumentNullException(nameof(item));
             }
 
             return (item._parent == this);
@@ -46,7 +46,7 @@ namespace VisioAutomation.VDX
         {
             if (item == null)
             {
-                throw new System.ArgumentNullException("item");
+                throw new System.ArgumentNullException(nameof(item));
             }
 
             if (item._parent == this)
@@ -64,7 +64,7 @@ namespace VisioAutomation.VDX
 
             if (this.ContainsName(name))
             {
-                throw new System.ArgumentException("Already contains an item with that name", "item");
+                throw new System.ArgumentException("Already contains an item with that name", nameof(item));
             }
             else
             {

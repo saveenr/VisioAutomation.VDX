@@ -64,11 +64,6 @@ namespace VisioAutomation.VDX.Elements
 {
     public class Drawing : Node
     {
-        private readonly PageList _pages;
-        private readonly FaceList _faces;
-        private readonly List<Window> _windows;
-        private readonly List<ColorEntry> _colors;
-
         private readonly Dictionary<string, MasterMetadata> master_metadata =
             new Dictionary<string, MasterMetadata>(System.StringComparer.InvariantCultureIgnoreCase);
 
@@ -82,15 +77,15 @@ namespace VisioAutomation.VDX.Elements
         {
             if (template == null)
             {
-                throw new System.ArgumentNullException("template");
+                throw new System.ArgumentNullException(nameof(template));
             }
 
             this.dom = template.LoadCleanDOM();
 
-            this._pages = new PageList(this);
-            this._faces = new FaceList();
-            this._windows = new List<Window>();
-            this._colors = new List<ColorEntry>();
+            this.Pages = new PageList(this);
+            this.Faces = new FaceList();
+            this.Windows = new List<Window>();
+            this.Colors = new List<ColorEntry>();
 
             var masters_el = this.dom.Root.ElementVisioSchema2003("Masters");
             if (masters_el == null)
@@ -129,7 +124,7 @@ namespace VisioAutomation.VDX.Elements
                 var id = int.Parse(face_el.Attribute("ID").Value);
                 var name = face_el.Attribute("Name").Value;
                 var face = new Face(id, name);
-                this._faces.Add(face);
+                this.Faces.Add(face);
             }
 
             var colors_el = this.dom.Root.ElementVisioSchema2003("Colors");
@@ -139,29 +134,17 @@ namespace VisioAutomation.VDX.Elements
                 int rgb = int.Parse(rgb_s.Substring(1), System.Globalization.NumberStyles.AllowHexSpecifier);
                 var ce = new ColorEntry();
                 ce.RGB = rgb;
-                this._colors.Add(ce);
+                this.Colors.Add(ce);
             }
         }
 
-        public NamedNodeList<Page> Pages
-        {
-            get { return this._pages; }
-        }
+        public PageList Pages { get; }
 
-        public NamedNodeList<Face> Faces
-        {
-            get { return this._faces; }
-        }
+        public FaceList Faces { get; }
 
-        public List<Window> Windows
-        {
-            get { return this._windows; }
-        }
+        public List<Window> Windows { get; }
 
-        public List<ColorEntry> Colors
-        {
-            get { return this._colors; }
-        }
+        public List<ColorEntry> Colors { get; }
 
         internal int GetNextShapeID()
         {
@@ -180,7 +163,7 @@ namespace VisioAutomation.VDX.Elements
                 }
             }
 
-            throw new System.ArgumentException("no such master id", "id");
+            throw new System.ArgumentException("no such master id", nameof(id));
         }
 
         public MasterMetadata GetMasterMetaData(string name)
@@ -190,22 +173,19 @@ namespace VisioAutomation.VDX.Elements
 
         public Face AddFace(string name)
         {
-            if (!this._faces.ContainsName(name))
+            if (!this.Faces.ContainsName(name))
             {
-                var new_face = new Face(this._faces.Count + 1, name);
-                this._faces.Add(new_face);
+                var new_face = new Face(this.Faces.Count + 1, name);
+                this.Faces.Add(new_face);
                 return new_face;
             }
             else
             {
-                return this._faces[name];
+                return this.Faces[name];
             }
         }
 
-        public static string DefaultTemplateXML
-        {
-            get { return Properties.Resources.DefaultVDXTemplate; }
-        }
+        public static string DefaultTemplateXML => Properties.Resources.DefaultVDXTemplate;
 
         public void Save(string filename)
         {

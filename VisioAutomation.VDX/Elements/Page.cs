@@ -23,12 +23,12 @@ namespace VisioAutomation.VDX.Elements
         {
             if (width < 0)
             {
-                throw new System.ArgumentOutOfRangeException("width");
+                throw new System.ArgumentOutOfRangeException(nameof(width));
             }
 
             if (height < 0)
             {
-                throw new System.ArgumentOutOfRangeException("height");
+                throw new System.ArgumentOutOfRangeException(nameof(height));
             }
 
             this.Shapes = new ShapeList(this);
@@ -92,11 +92,11 @@ namespace VisioAutomation.VDX.Elements
         {
             if (shape1 == null)
             {
-                throw new System.ArgumentNullException("shape1");
+                throw new System.ArgumentNullException(nameof(shape1));
             }
             if (shape2 == null)
             {
-                throw new System.ArgumentNullException("shape2");
+                throw new System.ArgumentNullException(nameof(shape2));
             }
 
             if (shape1 == shape2)

@@ -9,12 +9,12 @@ namespace VisioAutomation.VDX.Elements
         {
             if (string.IsNullOrEmpty(to_cell))
             {
-                throw new System.ArgumentException("to_cell cannot be null or empty", "to_cell");
+                throw new System.ArgumentException("to_cell cannot be null or empty", nameof(to_cell));
             }
 
             if (string.IsNullOrEmpty(from_cell))
             {
-                throw new System.ArgumentException("from_cell cannot be null or empty", "from_cell");
+                throw new System.ArgumentException("from_cell cannot be null or empty", nameof(from_cell));
             }
 
             this.FromSheet = from_shape.ID;
