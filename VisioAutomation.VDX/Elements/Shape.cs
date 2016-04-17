@@ -14,7 +14,7 @@ namespace VisioAutomation.VDX.Elements
         public Sections.XForm1D XForm1D;
         public Sections.Protection Protection;
         public Sections.Fill Fill;
-        public Line Line;
+        public Sections.Line Line;
         public Sections.TextXForm TextXForm;
         public Sections.Misc Misc;
         public Sections.Event Event;

@@ -11,7 +11,6 @@ namespace VisioAutomation.VDX.Elements
         public Sections.PageLayout PageLayout;
         public Sections.PrintProperties PrintProperties;
 
-        private readonly int _id;
         public string Name;
         public readonly List<Connect> Connects;
         public readonly LayerList Layers;
@@ -23,12 +22,12 @@ namespace VisioAutomation.VDX.Elements
         {
             if (width < 0)
             {
-                throw new System.ArgumentOutOfRangeException("width");
+                throw new System.ArgumentOutOfRangeException(nameof(width));
             }
 
             if (height < 0)
             {
-                throw new System.ArgumentOutOfRangeException("height");
+                throw new System.ArgumentOutOfRangeException(nameof(height));
             }
 
             this.Shapes = new ShapeList(this);
@@ -38,22 +37,19 @@ namespace VisioAutomation.VDX.Elements
             this.PageProperties.PageHeight.Result = height;
             this.PrintProperties = new Sections.PrintProperties();
             this.PageLayout = new Sections.PageLayout();
-            this._id = Page.idgen.GetNextID();
+            this.ID = Page.idgen.GetNextID();
             var culture = System.Globalization.CultureInfo.InvariantCulture;
-            this.Name = string.Format(culture, "Page-{0}", this._id + 1);
+            this.Name = string.Format(culture, "Page-{0}", this.ID + 1);
             this.Layers = new LayerList();
         }
 
-        public int ID
-        {
-            get { return this._id; }
-        }
+        public int ID { get; }
 
         internal void AddToElement(SXL.XElement parent)
         {
             var page_el = Internal.XMLUtil.CreateVisioSchema2003Element("Page");
             var invariant_culture = System.Globalization.CultureInfo.InvariantCulture;
-            page_el.SetAttributeValue("ID", this._id.ToString(invariant_culture));
+            page_el.SetAttributeValue("ID", this.ID.ToString(invariant_culture));
             page_el.SetAttributeValue("NameU", this.Name);
 
             var pagesheet_el = Internal.XMLUtil.CreateVisioSchema2003Element("PageSheet");
@@ -92,11 +88,11 @@ namespace VisioAutomation.VDX.Elements
         {
             if (shape1 == null)
             {
-                throw new System.ArgumentNullException("shape1");
+                throw new System.ArgumentNullException(nameof(shape1));
             }
             if (shape2 == null)
             {
-                throw new System.ArgumentNullException("shape2");
+                throw new System.ArgumentNullException(nameof(shape2));
             }
 
             if (shape1 == shape2)

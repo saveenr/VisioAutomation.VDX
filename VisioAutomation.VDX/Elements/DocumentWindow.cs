@@ -42,7 +42,7 @@ namespace VisioAutomation.VDX.Elements
         {
             if (drawing==null)
             {
-                throw new System.ArgumentNullException("drawing");
+                throw new System.ArgumentNullException(nameof(drawing));
             }
 
             if (this.Page < 0)
