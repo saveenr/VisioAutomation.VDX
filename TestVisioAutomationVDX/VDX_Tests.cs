@@ -27,7 +27,7 @@ namespace TestVisioAutomationVDX
         {
             var app = new IVisio.Application();
             var version = VA.Application.ApplicationHelper.GetVersion(app);
-            string logfilename = VA.Application.ApplicationHelper.GetXMLErrorLogFilename(app);
+            string logfilename = VA.Application.ApplicationHelper.GetXmlErrorLogFilename(app);
 
             VA.Application.Logging.XmlErrorLog log_before = null;
             var old_fileinfo = new FileInfo(logfilename);
@@ -61,8 +61,8 @@ namespace TestVisioAutomationVDX
             // log_after exists
             VDX_Tests.VerifyNoErrorsInLog(log_after, filename, logfilename, version, time);
 
-            VA.Documents.DocumentHelper.ForceCloseAll(app.Documents);
-            app.Quit();
+            // Force close all docs
+            app.Quit(true);
         }
 
         private static void VerifyNoErrorsInLog(VA.Application.Logging.XmlErrorLog log_after, string filename, string logfilename, Version version, DateTime opentime)
@@ -289,7 +289,7 @@ namespace TestVisioAutomationVDX
             // Load the VDX
             var app = new IVisio.Application();
             var version = VA.Application.ApplicationHelper.GetVersion(app);
-            string logfilename = VA.Application.ApplicationHelper.GetXMLErrorLogFilename(app);
+            string logfilename = VA.Application.ApplicationHelper.GetXmlErrorLogFilename(app);
 
             var doc = this.TryOpen(app.Documents, input_filename);
             
@@ -312,7 +312,12 @@ namespace TestVisioAutomationVDX
             Assert.AreEqual(1, app.Documents.Count);
 
             // Cleanup
-            VA.Documents.DocumentHelper.ForceCloseAll(app.Documents);
+            // Force close all docs
+            var docs = app.Documents.ToEnumerable().ToList();
+            foreach (var d in docs)
+            {
+                d.Close(true);
+            }
             app.Quit(true);
         }
     }
