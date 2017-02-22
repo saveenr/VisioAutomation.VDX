@@ -50,6 +50,26 @@ namespace VisioAutomation.VDX
             dom.Save(output_filename, saveoptions);
         }
 
+        public void CreateVDX(Elements.Drawing vdoc, SXL.XDocument dom, System.IO.Stream objStream)
+        {
+            // Validate that all Document windows refer to an existing page
+            foreach(var window in vdoc.Windows)
+            {
+                if(window is Elements.DocumentWindow)
+                {
+                    var docwind = (Elements.DocumentWindow)window;
+                    docwind.ValidatePage(vdoc);
+                }
+            }
+            this.CreateVDX(vdoc, dom);
+
+            // important to use DisableFormatting - Visio is very sensitive to whitespace in the <Text> element when there is complex formatting
+            var saveoptions = SXL.SaveOptions.DisableFormatting;
+
+            dom.Save(objStream, saveoptions);
+            objStream.Position = 0;
+        }
+
         private void _ModifyTemplate( SXL.XDocument dom, Elements.Drawing doc_node)
         {
             if (dom.Root == null)

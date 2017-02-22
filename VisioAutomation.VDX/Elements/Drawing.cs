@@ -18,7 +18,7 @@ namespace VisioAutomation.VDX.Elements
 
         public Drawing(Template template)
         {
-            if (template == null)
+            if(template == null)
             {
                 throw new System.ArgumentNullException(nameof(template));
             }
@@ -31,13 +31,13 @@ namespace VisioAutomation.VDX.Elements
             this.Colors = new List<ColorEntry>();
 
             var masters_el = this.dom.Root.ElementVisioSchema2003("Masters");
-            if (masters_el == null)
+            if(masters_el == null)
             {
                 throw new System.InvalidOperationException();
             }
 
             // Store information about each master found in the drawing
-            foreach (var master_el in masters_el.ElementsVisioSchema2003("Master"))
+            foreach(var master_el in masters_el.ElementsVisioSchema2003("Master"))
             {
                 var name = master_el.Attribute("NameU").Value;
                 var id = int.Parse(master_el.Attribute("ID").Value);
@@ -62,7 +62,7 @@ namespace VisioAutomation.VDX.Elements
             }
 
             var facenames_el = this.dom.Root.ElementVisioSchema2003("FaceNames");
-            foreach (var face_el in facenames_el.ElementsVisioSchema2003("FaceName"))
+            foreach(var face_el in facenames_el.ElementsVisioSchema2003("FaceName"))
             {
                 var id = int.Parse(face_el.Attribute("ID").Value);
                 var name = face_el.Attribute("Name").Value;
@@ -71,7 +71,7 @@ namespace VisioAutomation.VDX.Elements
             }
 
             var colors_el = this.dom.Root.ElementVisioSchema2003("Colors");
-            foreach (var color_el in colors_el.ElementsVisioSchema2003("ColorEntry"))
+            foreach(var color_el in colors_el.ElementsVisioSchema2003("ColorEntry"))
             {
                 var rgb_s = color_el.Attribute("RGB").Value;
                 int rgb = int.Parse(rgb_s.Substring(1), System.Globalization.NumberStyles.AllowHexSpecifier);
@@ -98,9 +98,9 @@ namespace VisioAutomation.VDX.Elements
 
         public MasterMetadata GetMasterMetData(int id)
         {
-            foreach (var m in this.master_metadata)
+            foreach(var m in this.master_metadata)
             {
-                if (m.Value.ID == id)
+                if(m.Value.ID == id)
                 {
                     return m.Value;
                 }
@@ -116,7 +116,7 @@ namespace VisioAutomation.VDX.Elements
 
         public Face AddFace(string name)
         {
-            if (!this.Faces.ContainsName(name))
+            if(!this.Faces.ContainsName(name))
             {
                 var new_face = new Face(this.Faces.Count + 1, name);
                 this.Faces.Add(new_face);
@@ -133,12 +133,18 @@ namespace VisioAutomation.VDX.Elements
         public void Save(string filename)
         {
             string ext = System.IO.Path.GetExtension(filename).ToLower();
-            if (ext!=".vdx")
+            if(ext != ".vdx")
             {
-                throw new System.ArgumentException("only .vdx extension is supported",nameof(filename));
+                throw new System.ArgumentException("only .vdx extension is supported", nameof(filename));
             }
             var vdxWriter = new VDXWriter();
             vdxWriter.CreateVDX(this, this.dom, filename);
+        }
+
+        public void Save(System.IO.Stream objStream)
+        {
+            var vdxWriter = new VDXWriter();
+            vdxWriter.CreateVDX(this, this.dom, objStream);
         }
 
         internal void AccountForMasteSubshapes(int n)
