@@ -12,6 +12,7 @@
 
         public override void Add(Elements.Shape shape)
         {
+            this.ValidateItem(shape);
             if (this.page_el.Drawing == null)
             {
                 throw new System.ArgumentException(
@@ -21,10 +22,12 @@
             var master_md = this.page_el.Drawing.GetMasterMetData(shape.Master);
 
 
+            var culture = System.Globalization.CultureInfo.InvariantCulture;
+            string name = string.Format(culture, "Shape.{0}", this.page_el.Drawing.CurrentShapeID);
+            this.ValidateName(name);
             shape.Page = this.page_el;
             shape._id = this.page_el.Drawing.GetNextShapeID();
-            var culture = System.Globalization.CultureInfo.InvariantCulture;
-            shape.Name = string.Format(culture, "Shape.{0}", shape._id);
+            shape.Name = name;
 
             base.Add(shape);
 

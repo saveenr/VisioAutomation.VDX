@@ -1,0 +1,10 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies.net452" Version="1.0.3" />
+    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.2.2" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.2.2" />
+    <PackageVersion Include="MSTest.Analyzers" Version="4.2.2" />
+    <PackageVersion Include="VisioAutomation2010" Version="3.0.0" />
+  </ItemGroup>
+</Project>

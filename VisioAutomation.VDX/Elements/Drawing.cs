@@ -12,7 +12,7 @@ namespace VisioAutomation.VDX.Elements
 
         public Sections.DocumentProperties DocumentProperties = new Sections.DocumentProperties();
 
-        internal int CurrentShapeID = -100;
+        internal int CurrentShapeID = 1;
 
         private readonly SXL.XDocument dom;
 
@@ -57,8 +57,6 @@ namespace VisioAutomation.VDX.Elements
                 md.SubShapeCount = subshapes.Count();
 
                 this.master_metadata[md.Name] = md;
-
-                this.CurrentShapeID = 1;
             }
 
             var facenames_el = this.dom.Root.ElementVisioSchema2003("FaceNames");
@@ -118,7 +116,8 @@ namespace VisioAutomation.VDX.Elements
         {
             if (!this.Faces.ContainsName(name))
             {
-                var new_face = new Face(this.Faces.Count + 1, name);
+                int next_id = checked(this.Faces.Items.Select(face => face.ID).DefaultIfEmpty(0).Max() + 1);
+                var new_face = new Face(next_id, name);
                 this.Faces.Add(new_face);
                 return new_face;
             }
@@ -132,13 +131,22 @@ namespace VisioAutomation.VDX.Elements
 
         public void Save(string filename)
         {
-            string ext = System.IO.Path.GetExtension(filename).ToLower();
-            if (ext!=".vdx")
+            if (filename == null)
+            {
+                throw new System.ArgumentNullException(nameof(filename));
+            }
+            string ext = System.IO.Path.GetExtension(filename);
+            if (!string.Equals(ext, ".vdx", System.StringComparison.OrdinalIgnoreCase))
             {
                 throw new System.ArgumentException("only .vdx extension is supported",nameof(filename));
             }
-            var vdxWriter = new VDXWriter();
-            vdxWriter.CreateVDX(this, this.dom, filename);
+            // Formatting would insert whitespace into Visio's mixed-content Text elements.
+            this.ToXml().Save(filename, SXL.SaveOptions.DisableFormatting);
+        }
+
+        public SXL.XDocument ToXml()
+        {
+            return VDXWriter.CreateVDX(this, this.dom);
         }
 
         internal void AccountForMasteSubshapes(int n)

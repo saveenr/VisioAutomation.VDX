@@ -86,6 +86,10 @@ namespace VisioAutomation.VDX.Elements
 
         public void ConnectShapesViaConnector(Shape connectorshape, Shape shape1, Shape shape2)
         {
+            if (connectorshape == null)
+            {
+                throw new System.ArgumentNullException(nameof(connectorshape));
+            }
             if (shape1 == null)
             {
                 throw new System.ArgumentNullException(nameof(shape1));
@@ -98,6 +102,11 @@ namespace VisioAutomation.VDX.Elements
             if (shape1 == shape2)
             {
                 throw new System.ArgumentException("cannot connect shape to itself");
+            }
+
+            if (!this.Shapes.Contains(connectorshape) || !this.Shapes.Contains(shape1) || !this.Shapes.Contains(shape2))
+            {
+                throw new System.ArgumentException("Connector and endpoints must belong to this page");
             }
 
             var connect1 = new Connect(connectorshape, "BeginX", shape1, "PinX");

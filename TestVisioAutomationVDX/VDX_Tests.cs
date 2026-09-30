@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VisioAutomation.Extensions;
-using VACUSTPROP=VisioAutomation.Shapes.CustomProperties;
+using VACUSTPROP=VisioAutomation.Shapes;
 using IVisio = Microsoft.Office.Interop.Visio;
 using VA = VisioAutomation;
 using SXL = System.Xml.Linq;
@@ -25,89 +25,62 @@ namespace TestVisioAutomationVDX
 
         public void VerifyDocCanBeLoaded(string filename)
         {
-            var app = new IVisio.Application();
-            var version = VA.Application.ApplicationHelper.GetVersion(app);
-            string logfilename = VA.Application.ApplicationHelper.GetXmlErrorLogFilename(app);
-
-            VA.Application.Logging.XmlErrorLog log_before = null;
-            var old_fileinfo = new FileInfo(logfilename);
-
-            if (File.Exists(logfilename))
-            {
-                log_before = new VA.Application.Logging.XmlErrorLog(logfilename);
-            }
-
-            var time = DateTime.Now;
-            this.TryOpen(app.Documents, filename); // this causes the doc to load no matter what the error 
-
-            VA.Application.Logging.XmlErrorLog log_after = null;
-            if (File.Exists(logfilename))
-            {
-                log_after = new VA.Application.Logging.XmlErrorLog(logfilename);
-            }
-
-            if (log_before != null && log_after == null)
-            {
-                Assert.Fail("Invalid case for all visio versions - if it existed before it must exist after");
-                return;
-            }
- 
-            if (log_before == null && log_after == null)
-            {
-                // Didn't exist before, didn't exist after - that's fine - the file loaded with no issues
-                return;
-            }
-
-            // log_after exists
-            VDX_Tests.VerifyNoErrorsInLog(log_after, filename, logfilename, version, time);
-
-            // Force close all docs
-            app.Quit(true);
+            var app = this.GetApplication();
+            string source = this.CopyForOpen(filename);
+            var document = this.TryOpen(app.Documents, source);
+            Assert.IsNotNull(document);
+            var records = this.GetLoadRecords(app, source);
+            Assert.AreEqual(0, records.Count(record => record.Type == "Error"),
+                "Visio reported errors while loading " + source);
         }
 
-        private static void VerifyNoErrorsInLog(VA.Application.Logging.XmlErrorLog log_after, string filename, string logfilename, Version version, DateTime opentime)
+        private List<VA.Application.Logging.LogRecord> GetLoadRecords(IVisio.Application app, string source)
         {
-            int duration = 2;
-            var lower_time_bound = opentime;
-            var upper_time_bound = opentime.AddSeconds(duration);
-
-            // First see of any sessions matching the source exist
-            // If not, then the load must have been successful
-            var all_sessions_from_source = log_after.FileSessions.Where(s => s.Source == filename).ToList();
-            if (all_sessions_from_source.Count < 1)
+            string log_path = VA.Application.Logging.LoggingHelper.GetXmlErrorLogFilename(app);
+            if (!File.Exists(log_path))
             {
-                return;
+                return new List<VA.Application.Logging.LogRecord>();
             }
+            var log = this.ReadLog(log_path);
+            // Each open uses a unique path, so old sessions cannot satisfy this check.
+            return log.LogSessions
+                .Where(session => string.Equals(session.Source, source, StringComparison.OrdinalIgnoreCase))
+                .SelectMany(session => session.LogRecords).ToList();
+        }
 
-            // From that set of sessions, find the one closest in time to when we
-            // asked Visio to open the file.
-            // If none could be found, then then we assume no error could be found
-            // NOTE: It would be better not to have to rely on a time duration.
-            var sessions_near_in_time =
-                all_sessions_from_source.Where(c => (lower_time_bound <= c.StartTime && c.StartTime <= upper_time_bound)).ToList();
-            if (sessions_near_in_time.Count < 1)
+        private VA.Application.Logging.XmlErrorLog ReadLog(string log_path)
+        {
+            string snapshot = this.NewOutputPath() + ".log";
+            string text;
+            using (var stream = new FileStream(log_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream))
             {
-                // couldn't find any in the time period. We'll have to assume no error could be found.
-                return;
+                text = reader.ReadToEnd();
             }
+            // VisioAutomation2010 3.0.0 cannot parse space-padded single-digit days.
+            // Normalize a private copy until the upstream parser fix is published.
+            text = System.Text.RegularExpressions.Regex.Replace(text,
+                @"(?m)^(\w{3} \w{3}) +(\d{1,2})( \d{2}:\d{2}:\d{2} \d{4} Begin Session)",
+                match => match.Groups[1].Value + " " + match.Groups[2].Value.PadLeft(2, '0') + match.Groups[3].Value);
+            File.WriteAllText(snapshot, text);
+            return new VA.Application.Logging.XmlErrorLog(snapshot);
+        }
 
-            var target_session = all_sessions_from_source[0];
-
-            var warnings = target_session.Records.Where(rec => rec.Type == "Warning").ToList();
-            var errors = target_session.Records.Where(rec => rec.Type == "Error").ToList();
-
-            if (errors.Count > 0)
-            {                
-                string msg = string.Format("XML Error Log {0} contains an error", logfilename);
-                Assert.Fail(msg);
-            }
-
+        [TestMethod]
+        public void LogCompatibility_SpacePaddedDate_PreservesWarnings()
+        {
+            string source = this.NewOutputPath() + ".log";
+            File.WriteAllText(source, "Open VDX Processing Log\n\nSource: sample.vdx\n\n" +
+                "Mon May  4 05:41:19 2026 Begin Session\n\n[Warning] DataType:\nDescription: Example\n\n");
+            var session = this.ReadLog(source).LogSessions.Single();
+            Assert.AreEqual(new DateTime(2026, 5, 4, 5, 41, 19), session.StartTime);
+            Assert.AreEqual("Warning", session.LogRecords.Single().Type);
         }
 
         [TestMethod]
         public void VDX_MultiPageDocument()
         {
-            string output_filename = TestGlobals.TestHelper.GetTestMethodOutputFilename(".vdx");
+            string output_filename = this.NewOutputPath();
 
             var template = new VisioAutomation.VDX.Template(); // the default template
             var doc = new VisioAutomation.VDX.Elements.Drawing(template);
@@ -144,7 +117,7 @@ namespace TestVisioAutomationVDX
         [TestMethod]
         public void VDX_CustomProperties()
         {
-            string filename = TestGlobals.TestHelper.GetTestMethodOutputFilename(".vdx");
+            string filename = this.NewOutputPath();
 
             var template = new VisioAutomation.VDX.Template();
             var doc_node = new VisioAutomation.VDX.Elements.Drawing(template);
@@ -175,7 +148,7 @@ namespace TestVisioAutomationVDX
 
             doc_node.Save(filename);
 
-            var app = new IVisio.Application();
+            var app = this.GetApplication();
             var docs = app.Documents;
             var doc = docs.Add(filename);
 
@@ -184,29 +157,27 @@ namespace TestVisioAutomationVDX
             Assert.AreEqual(1,page.Shapes.Count);
 
             var shape = page.Shapes[1];
-            var customprops = VACUSTPROP.CustomPropertyHelper.Get(shape);
+            var customprops = VACUSTPROP.CustomPropertyHelper.GetDictionary(shape, VA.Core.CellValueType.Formula);
 
             Assert.IsTrue(customprops.ContainsKey("PROP1"));
-            Assert.AreEqual("\"VALUE1\"",customprops["PROP1"].Value.Formula);
+            Assert.AreEqual("\"VALUE1\"",customprops["PROP1"].Formula.Value);
 
 
             Assert.IsTrue(customprops.ContainsKey("PROP2"));
-            Assert.AreEqual("\"123\"", customprops["PROP2"].Value.Formula);
-            Assert.AreEqual("0", customprops["PROP2"].Type.Formula);
+            Assert.AreEqual("\"123\"", customprops["PROP2"].Formula.Value);
+            Assert.AreEqual("0", customprops["PROP2"].Type.Value);
 
             Assert.IsTrue(customprops.ContainsKey("PROP3"));
-            Assert.AreEqual("\"456\"", customprops["PROP3"].Value.Formula);
-            Assert.AreEqual("2", customprops["PROP3"].Type.Formula);
+            Assert.AreEqual("\"456\"", customprops["PROP3"].Formula.Value);
+            Assert.AreEqual("2", customprops["PROP3"].Type.Value);
 
-            app.Quit(true);
         }
 
         [TestMethod]
-        [DeploymentItem(@"datafiles\template_router.vdx", "datafiles")]
         public void VDX_CustomTemplate()
         {
             string input_filename = this.GetTestResultsOutPath(@"datafiles\template_router.vdx");
-            string output_filename = TestGlobals.TestHelper.GetTestMethodOutputFilename(".vdx");
+            string output_filename = this.NewOutputPath();
             
             // Load the template
             string template_xml = File.ReadAllText(input_filename);
@@ -269,7 +240,6 @@ namespace TestVisioAutomationVDX
         }
 
         [TestMethod]
-        [DeploymentItem(@"datafiles\template_router.vdx", "datafiles")]
         public void VDX_CheckNoErrorOnLoad()
         {
             var folder = this.TestResultsOutFolder;
@@ -281,23 +251,20 @@ namespace TestVisioAutomationVDX
 
 
         [TestMethod]
-        [DeploymentItem(@"datafiles\vdx_with_warnings_1.vdx", "datafiles")]
         public void VDX_DetectLoadWarnings()
         {
-            string input_filename = this.GetTestResultsOutPath(@"datafiles\vdx_with_warnings_1.vdx");
+            string input_filename = this.CopyForOpen(this.GetTestResultsOutPath(@"datafiles\vdx_with_warnings_1.vdx"));
  
             // Load the VDX
-            var app = new IVisio.Application();
+            var app = this.GetApplication();
             var version = VA.Application.ApplicationHelper.GetVersion(app);
-            string logfilename = VA.Application.ApplicationHelper.GetXmlErrorLogFilename(app);
 
             var doc = this.TryOpen(app.Documents, input_filename);
             
             // See what happened
-            var log_after = new VA.Application.Logging.XmlErrorLog(logfilename);
-            var most_recent_session = log_after.FileSessions[0];
-            var warnings = most_recent_session.Records.Where(r => r.Type == "Warning").ToList();
-            var errors = most_recent_session.Records.Where(r => r.Type == "Error").ToList();
+            var records = this.GetLoadRecords(app, input_filename);
+            var warnings = records.Where(r => r.Type == "Warning").ToList();
+            var errors = records.Where(r => r.Type == "Error").ToList();
 
             // Verify
             int expected_errors = 0;  // this VDX should not report any errors
@@ -311,14 +278,6 @@ namespace TestVisioAutomationVDX
             Assert.AreEqual(expected_warnings, warnings.Count); // this VDX should contain exactly two warnings                                
             Assert.AreEqual(1, app.Documents.Count);
 
-            // Cleanup
-            // Force close all docs
-            var docs = app.Documents.ToEnumerable().ToList();
-            foreach (var d in docs)
-            {
-                d.Close(true);
-            }
-            app.Quit(true);
         }
     }
 }

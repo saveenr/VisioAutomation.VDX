@@ -1,0 +1,4 @@
+root = true
+
+[*.cs]
+dotnet_diagnostic.MSTEST0030.severity = error

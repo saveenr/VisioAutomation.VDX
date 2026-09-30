@@ -12,8 +12,8 @@
 
         public override void Add(Elements.Page page)
         {
-            page.Drawing = this.drawing_el;
             base.Add(page);
+            page.Drawing = this.drawing_el;
         }
     }
 }

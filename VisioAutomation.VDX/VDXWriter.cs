@@ -1,99 +1,56 @@
 using SXL=System.Xml.Linq;
-using VA=VisioAutomation;
 using VisioAutomation.VDX.Internal.Extensions;
-
 
 namespace VisioAutomation.VDX
 {
-    internal class VDXWriter
+    internal static class VDXWriter
     {
-        public VDXWriter()
+        public static SXL.XDocument CreateVDX(Elements.Drawing drawing, SXL.XDocument template)
         {
-        }
-
-        public void CreateVDX(Elements.Drawing vdoc, SXL.XDocument dom)
-        {
-            if (vdoc == null)
+            foreach (var window in drawing.Windows)
             {
-                throw new System.ArgumentNullException(nameof(vdoc));
-            }
-
-            if (dom == null)
-            {
-                throw new System.ArgumentNullException(nameof(dom));
-            }
-
-            this._ModifyTemplate(dom, vdoc);
-        }
-
-        public void CreateVDX(Elements.Drawing vdoc, SXL.XDocument dom, string output_filename)
-        {
-            if (output_filename == null)
-            {
-                throw new System.ArgumentNullException(nameof(output_filename));
-            }
-
-            // Validate that all Document windows refer to an existing page
-            foreach (var window in vdoc.Windows)
-            {
-                if (window is Elements.DocumentWindow)
+                if (window is Elements.DocumentWindow document_window)
                 {
-                    var docwind = (Elements.DocumentWindow) window;
-                    docwind.ValidatePage(vdoc);
+                    document_window.ValidatePage(drawing);
                 }
             }
-            this.CreateVDX(vdoc, dom);
 
-            // important to use DisableFormatting - Visio is very sensitive to whitespace in the <Text> element when there is complex formatting
-            var saveoptions = SXL.SaveOptions.DisableFormatting;
-
-            dom.Save(output_filename, saveoptions);
-        }
-
-        private void _ModifyTemplate( SXL.XDocument dom, Elements.Drawing doc_node)
-        {
-            if (dom.Root == null)
-            {
-                throw new System.ArgumentException("DOM must have a root node");
-            }
-
+            // Each serialization owns its DOM; neither writes nor callers can alter the template.
+            var dom = new SXL.XDocument(template);
             var root = dom.Root;
-            root.AddFirst(doc_node.DocumentProperties.ToXml());
+            root.AddFirst(drawing.DocumentProperties.ToXml());
 
-            var xfacenames = root.ElementVisioSchema2003("FaceNames");
-            xfacenames.RemoveAll();
-
-            foreach (var vface in doc_node.Faces.Items)
+            var faces = root.ElementVisioSchema2003("FaceNames");
+            faces.RemoveNodes();
+            foreach (var face in drawing.Faces.Items)
             {
-                vface.ToXml(xfacenames);
+                face.ToXml(faces);
             }
 
-            var xcolors = root.ElementVisioSchema2003("Colors");
-            xcolors.RemoveAll();
-
-            int ix = 0;
-            foreach (var color in doc_node.Colors)
+            var colors = root.ElementVisioSchema2003("Colors");
+            colors.RemoveNodes();
+            int index = 0;
+            foreach (var color in drawing.Colors)
             {
-                color.AddToElement(xcolors, ix++);
+                color.AddToElement(colors, index++);
             }
 
-            var xpages = root.ElementVisioSchema2003("Pages");
-
-            foreach (var page_node in doc_node.Pages.Items)
+            var pages = root.ElementVisioSchema2003("Pages");
+            foreach (var page in drawing.Pages.Items)
             {
-                page_node.AddToElement(xpages);
+                page.AddToElement(pages);
             }
 
-            if (doc_node.Windows != null && doc_node.Windows.Count > 0)
+            if (drawing.Windows.Count > 0)
             {
-                var xwindows = Internal.XMLUtil.CreateVisioSchema2003Element("Windows");
-                root.Add(xwindows);
-
-                foreach (var window in doc_node.Windows)
+                var windows = Internal.XMLUtil.CreateVisioSchema2003Element("Windows");
+                root.Add(windows);
+                foreach (var window in drawing.Windows)
                 {
-                    window.AddToElement(xwindows);
+                    window.AddToElement(windows);
                 }
             }
+            return dom;
         }
     }
 }

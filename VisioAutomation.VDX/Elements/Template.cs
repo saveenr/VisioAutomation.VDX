@@ -1,56 +1,54 @@
 using VisioAutomation.VDX.Internal.Extensions;
+using System.Xml.Linq;
 
 namespace VisioAutomation.VDX
 {
     public class Template
     {
-        private string xml;
+        private readonly string xml;
 
-        public Template()
+        public Template() : this(Elements.Drawing.DefaultTemplateXML)
         {
-            this.xml = Elements.Drawing.DefaultTemplateXML;
         }
 
         public Template(string xml)
         {
-            this.xml = xml;
+            this.xml = xml ?? throw new System.ArgumentNullException(nameof(xml));
         }
 
-        internal System.Xml.Linq.XDocument LoadCleanDOM()
+        internal XDocument LoadCleanDOM()
         {
-            var dom = System.Xml.Linq.XDocument.Parse(this.xml);
-            Template.CleanUpTemplate(dom);
-            return dom;                
+            var dom = XDocument.Parse(this.xml);
+            CleanUpTemplate(dom);
+            return dom;
         }
 
-        public static void CleanUpTemplate(System.Xml.Linq.XDocument vdx_xml_doc)
+        public static void CleanUpTemplate(XDocument vdx_xml_doc)
         {
-            var root = vdx_xml_doc.Root;
-
-            string ns_2003 = Internal.Constants.VisioXmlNamespace2003;
-
-            // set document properties
-            var docprops = root.ElementVisioSchema2003("DocumentProperties");
-            docprops.RemoveElement(ns_2003 + "PreviewPicture");
-            docprops.SetElementValue(ns_2003 + "Creator", "");
-            docprops.SetElementValue(ns_2003 + "Company", "");
-
-            // remove any pages
-            var pages = root.ElementVisioSchema2003("Pages");
-            pages.RemoveNodes();
-
-            // Do not remove the FaceNames node - it contains fonts to which the template may be referring
-            root.RemoveElement(ns_2003 + "Windows");
-            root.RemoveElement(ns_2003 + "DocumentProperties");
-
-
-            // TODO Add DocumentSettings to VDX
-            var docsettings = root.ElementsVisioSchema2003("DocumentSettings");
-            if (docsettings != null)
+            if (vdx_xml_doc == null)
             {
-                System.Xml.Linq.Extensions.Remove(docsettings);
+                throw new System.ArgumentNullException(nameof(vdx_xml_doc));
             }
-        }
+            string ns = Internal.Constants.VisioXmlNamespace2003;
+            var root = vdx_xml_doc.Root;
+            if (root == null || root.Name != ns + "VisioDocument")
+            {
+                throw new System.ArgumentException("Template must contain a Visio 2003 VisioDocument root", nameof(vdx_xml_doc));
+            }
 
+            root.Elements(ns + "DocumentProperties").Remove();
+            root.Elements(ns + "Windows").Remove();
+            root.Elements(ns + "DocumentSettings").Remove();
+
+            // Preserve resources referenced by masters, but replace template pages.
+            foreach (string name in new[] { "FaceNames", "Colors", "Masters", "Pages" })
+            {
+                if (root.Element(ns + name) == null)
+                {
+                    root.Add(new XElement(ns + name));
+                }
+            }
+            root.Element(ns + "Pages").RemoveNodes();
+        }
     }
 }
