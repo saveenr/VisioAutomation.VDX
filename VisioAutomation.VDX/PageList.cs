@@ -1,19 +1,18 @@
-﻿namespace VisioAutomation.VDX
+﻿namespace VisioAutomation.VDX;
+
+public class PageList : NamedNodeList<Elements.Page>
 {
-    public class PageList : NamedNodeList<Elements.Page>
+    private readonly Elements.Drawing drawing_el;
+
+    public PageList(Elements.Drawing drawing_el) :
+        base(page => page.Name)
     {
-        private readonly Elements.Drawing drawing_el;
+        this.drawing_el = drawing_el;
+    }
 
-        public PageList(Elements.Drawing drawing_el) :
-            base(page => page.Name)
-        {
-            this.drawing_el = drawing_el;
-        }
-
-        public override void Add(Elements.Page page)
-        {
-            base.Add(page);
-            page.Drawing = this.drawing_el;
-        }
+    public override void Add(Elements.Page page)
+    {
+        base.Add(page);
+        page.Drawing = this.drawing_el;
     }
 }

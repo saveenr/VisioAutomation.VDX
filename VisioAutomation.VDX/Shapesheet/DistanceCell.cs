@@ -1,10 +1,9 @@
-namespace VisioAutomation.VDX.ShapeSheet
+namespace VisioAutomation.VDX.ShapeSheet;
+
+public class DistanceCell : CellScalar<double>
 {
-    public class DistanceCell : CellScalar<double>
+    public DistanceCell()
+        : base(CellUnit.Inch)
     {
-        public DistanceCell()
-            : base(CellUnit.Inch)
-        {
-        }
     }
 }

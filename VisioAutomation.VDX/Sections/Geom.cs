@@ -4,39 +4,38 @@ using VisioAutomation.VDX.Internal;
 using VisioAutomation.VDX.ShapeSheet;
 using SXL = System.Xml.Linq;
 
-namespace VisioAutomation.VDX.Sections
+namespace VisioAutomation.VDX.Sections;
+
+public class Geom
 {
-    public class Geom
+    public BoolCell NoFill = new();
+    public BoolCell NoLine = new();
+    public BoolCell NoShow = new();
+    public BoolCell NoSnap = new();
+
+    public readonly List<GeomRow> Rows;
+
+    public Geom()
     {
-        public BoolCell NoFill = new BoolCell();
-        public BoolCell NoLine = new BoolCell();
-        public BoolCell NoShow = new BoolCell();
-        public BoolCell NoSnap = new BoolCell();
+        this.Rows = new List<GeomRow>();
+    }
 
-        public readonly List<GeomRow> Rows;
+    public void AddToElement(SXL.XElement parent, int index)
+    {
+        var el = XMLUtil.CreateVisioSchema2003Element("Geom");
+        el.SetAttributeValueInt("IX", index);
+        el.Add(this.NoFill.ToXml("NoFill"));
+        el.Add(this.NoLine.ToXml("NoLine"));
+        el.Add(this.NoShow.ToXml("NoShow"));
+        el.Add(this.NoSnap.ToXml("NoSnap"));
 
-        public Geom()
+        int ix = 0;
+        foreach (var geomrow in this.Rows)
         {
-            this.Rows = new List<GeomRow>();
+            geomrow.AddToElement(el, ix + 1);
+            ix++;
         }
 
-        public void AddToElement(SXL.XElement parent, int index)
-        {
-            var el = XMLUtil.CreateVisioSchema2003Element("Geom");
-            el.SetAttributeValueInt("IX", index);
-            el.Add(this.NoFill.ToXml("NoFill"));
-            el.Add(this.NoLine.ToXml("NoLine"));
-            el.Add(this.NoShow.ToXml("NoShow"));
-            el.Add(this.NoSnap.ToXml("NoSnap"));
-
-            int ix = 0;
-            foreach (var geomrow in this.Rows)
-            {
-                geomrow.AddToElement(el, ix + 1);
-                ix++;
-            }
-
-            parent.Add(el);
-        }
+        parent.Add(el);
     }
 }

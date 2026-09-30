@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Changed
+- Adopted SLNX, C# 13, and explicit .NET 9 SDK selection; removed stale solution configurations and assembly boilerplate without changing public API or runtime targets.
+- Replaced duplicated ResX template resources with one embedded XML resource. Removed the vendored NuGet executable, unused test resources, and unnecessary WinForms reference.
+- Removed personal template metadata and absolute Office/stencil paths from fixtures. Package authorship now uses a project-level contributor label; license attribution and hosting links remain intact.
 - Library and font tool now target .NET Framework 4.5.2 instead of 4.0, matching VisioAutomation. Consumers targeting net40 must upgrade before adopting the next release.
 - SDK-style projects restore reference assemblies and centrally managed dependencies; tests use .NET Framework 4.7.2 and MSTest 4.2.2.
 - NuGet packages use the Release DLL under lib/net452, with README and MIT license metadata.

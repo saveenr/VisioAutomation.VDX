@@ -15,7 +15,6 @@
     <ProjectReference Include="..\VisioAutomation.VDX\VisioAutomation.VDX.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
     <None Update="datafiles\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

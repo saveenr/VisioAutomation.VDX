@@ -2,3 +2,11 @@ root = true
 
 [*.cs]
 dotnet_diagnostic.MSTEST0030.severity = error
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_implicit_object_creation_when_type_is_apparent = true:warning
+csharp_style_expression_bodied_properties = when_on_single_line:warning
+csharp_prefer_braces = true
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0161.severity = warning
+dotnet_diagnostic.IDE0090.severity = warning
+dotnet_diagnostic.IDE0025.severity = warning

@@ -1,10 +1,9 @@
-namespace VisioAutomation.VDX.ShapeSheet
+namespace VisioAutomation.VDX.ShapeSheet;
+
+public static class Converter
 {
-    public static class Converter
+    public static double PointsToInches(double points)
     {
-        public static double PointsToInches(double points)
-        {
-            return points/72.0;
-        }
+        return points / 72.0;
     }
 }

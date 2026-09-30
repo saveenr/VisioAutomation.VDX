@@ -2,8 +2,7 @@
   <metadata>
     <id>VisioAutomation.VDX</id>
     <version>1.1.3</version>
-    <authors>saveenr</authors>
-    <owners>saveenr</owners>
+    <authors>VisioAutomation contributors</authors>
     <license type="expression">MIT</license>
     <readme>README.md</readme>
     <projectUrl>https://github.com/saveenr/VisioAutomation.VDX</projectUrl>

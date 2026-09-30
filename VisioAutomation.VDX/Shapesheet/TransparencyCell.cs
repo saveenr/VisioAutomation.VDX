@@ -1,10 +1,9 @@
-namespace VisioAutomation.VDX.ShapeSheet
+namespace VisioAutomation.VDX.ShapeSheet;
+
+public class TransparencyCell : CellScalar<double>
 {
-    public class TransparencyCell : CellScalar<double>
+    public TransparencyCell()
+        : base(CellUnit.None)
     {
-        public TransparencyCell()
-            : base(CellUnit.None)
-        {
-        }
     }
 }

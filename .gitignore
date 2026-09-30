@@ -168,3 +168,7 @@ pip-log.txt
 .DS_Store
 
 !*.targets
+
+# IDE-local state is never a build input.
+.vs/
+.idea/

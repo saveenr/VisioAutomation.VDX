@@ -1,8 +1,7 @@
-namespace VisioAutomation.VDX.Enums
+namespace VisioAutomation.VDX.Enums;
+
+public enum PageShapeSplit
 {
-    public enum PageShapeSplit
-    {
-        None = 0,
-        Allow = 1
-    }
+    None = 0,
+    Allow = 1
 }

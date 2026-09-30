@@ -1,11 +1,10 @@
-namespace VisioAutomation.VDX.ShapeSheet
+namespace VisioAutomation.VDX.ShapeSheet;
+
+public enum CellUnit
 {
-    public enum CellUnit
-    {
-        None,
-        Inch,
-        Point,
-        Radian,
-        Number
-    }
+    None,
+    Inch,
+    Point,
+    Radian,
+    Number
 }

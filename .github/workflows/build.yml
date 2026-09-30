@@ -21,14 +21,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: microsoft/setup-msbuild@v2
         with:
-          vs-version: '17.0'
+          vs-version: '[17.14,18.0)'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Check repository portability
+        shell: powershell
+        run: .\scripts\Test-Repository.ps1
       - name: Restore and build
-        run: msbuild VisioAutomationVDX.sln -restore -p:Configuration=${{ matrix.configuration }} "-p:Platform=Any CPU" -m
+        run: msbuild VisioAutomationVDX.slnx -restore -p:Configuration=${{ matrix.configuration }} "-p:Platform=Any CPU" -m
+      - name: Check C# style
+        run: dotnet format style VisioAutomationVDX.slnx --no-restore --diagnostics IDE0005 IDE0161 IDE0090 IDE0025 --severity info --verify-no-changes
       - name: Test without Visio
         shell: powershell
         run: |
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -version '[17.0,18.0)' -products '*' -requires Microsoft.Component.MSBuild -latest -property installationPath
+          $vs = & $vswhere -version '[17.14,18.0)' -products '*' -requires Microsoft.Component.MSBuild -latest -property installationPath
           if (-not $vs) { throw 'Visual Studio 2022 was not found.' }
           $vstest = Join-Path $vs 'Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'
           & $vstest 'TestVisioAutomationVDX.Unit\bin\${{ matrix.configuration }}\TestVisioAutomationVDX.Unit.dll' /Platform:x64 '/Logger:trx;LogFileName=unit.trx' /ResultsDirectory:TestResults

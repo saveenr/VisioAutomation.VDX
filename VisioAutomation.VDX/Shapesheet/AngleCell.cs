@@ -1,10 +1,9 @@
-namespace VisioAutomation.VDX.ShapeSheet
+namespace VisioAutomation.VDX.ShapeSheet;
+
+public class AngleCell : CellScalar<double>
 {
-    public class AngleCell : CellScalar<double>
+    public AngleCell()
+        : base(CellUnit.Radian)
     {
-        public AngleCell()
-            : base(CellUnit.Radian)
-        {
-        }
     }
 }

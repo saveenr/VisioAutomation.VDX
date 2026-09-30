@@ -1,9 +1,8 @@
-namespace VisioAutomation.VDX.Enums
+namespace VisioAutomation.VDX.Enums;
+
+public enum ConLineRouteExt
 {
-    public enum ConLineRouteExt
-    {
-        Default = 0,
-        Straight = 1,
-        NURBS = 2
-    }
+    Default = 0,
+    Straight = 1,
+    NURBS = 2
 }

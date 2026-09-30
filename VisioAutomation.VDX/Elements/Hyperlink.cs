@@ -1,26 +1,22 @@
-using VA=VisioAutomation;
-using SXL = System.Xml.Linq;
+namespace VisioAutomation.VDX.Elements;
 
-namespace VisioAutomation.VDX.Elements
+public class Hyperlink
 {
-    public class Hyperlink
+    public string Description;
+    public string Address;
+    public string SubAddress;
+
+    public Hyperlink(string description, string address, string subaddress)
     {
-        public string Description;
-        public string Address;
-        public string SubAddress;
+        this.Address = address;
+        this.Description = description;
+        this.SubAddress = subaddress;
+    }
 
-        public Hyperlink(string description, string address, string subaddress)
-        {
-            this.Address = address;
-            this.Description = description;
-            this.SubAddress = subaddress;
-        }
-
-        public Hyperlink(string description, string address)
-        {
-            this.Address = address;
-            this.Description = description;
-            this.SubAddress = null;
-        }
+    public Hyperlink(string description, string address)
+    {
+        this.Address = address;
+        this.Description = description;
+        this.SubAddress = null;
     }
 }

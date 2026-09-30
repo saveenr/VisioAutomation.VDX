@@ -1,12 +1,11 @@
-namespace VisioAutomation.VDX.Enums
+namespace VisioAutomation.VDX.Enums;
+
+[System.Flags]
+public enum CharStyle
 {
-    [System.Flags]
-    public enum CharStyle
-    {
-        None = 0,
-        Bold = 1,
-        Italic = 2,
-        Underline = 4,
-        SmallCaps = 8
-    }
+    None = 0,
+    Bold = 1,
+    Italic = 2,
+    Underline = 4,
+    SmallCaps = 8
 }

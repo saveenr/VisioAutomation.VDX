@@ -1,8 +1,7 @@
-namespace VisioAutomation.VDX
+namespace VisioAutomation.VDX;
+
+public enum TextType
 {
-    public enum TextType
-    {
-        PlainText,
-        FormattedText
-    }
+    PlainText,
+    FormattedText
 }

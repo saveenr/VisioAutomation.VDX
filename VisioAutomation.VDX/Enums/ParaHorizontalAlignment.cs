@@ -1,10 +1,9 @@
-namespace VisioAutomation.VDX.Enums
+namespace VisioAutomation.VDX.Enums;
+
+public enum ParaHorizontalAlignment
 {
-    public enum ParaHorizontalAlignment
-    {
-        Left = 0,
-        Center = 1,
-        Right = 2,
-        Justify = 3
-    }
+    Left = 0,
+    Center = 1,
+    Right = 2,
+    Justify = 3
 }

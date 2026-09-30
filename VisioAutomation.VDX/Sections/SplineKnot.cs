@@ -3,22 +3,21 @@ using VisioAutomation.VDX.Internal;
 using VisioAutomation.VDX.ShapeSheet;
 using SXL = System.Xml.Linq;
 
-namespace VisioAutomation.VDX.Sections
-{
-    public class SplineKnot : GeomRow
-    {
-        public DistanceCell X = new DistanceCell();
-        public DistanceCell Y = new DistanceCell();
-        public StringCell A = new StringCell();
+namespace VisioAutomation.VDX.Sections;
 
-        public override void AddToElement(SXL.XElement parent, int index)
-        {
-            var el = XMLUtil.CreateVisioSchema2003Element("SplineKnot");
-            el.SetAttributeValueInt("IX", index);
-            el.Add(this.X.ToXml("X"));
-            el.Add(this.Y.ToXml("Y"));
-            el.Add(this.A.ToXml("A"));
-            parent.Add(el);
-        }
+public class SplineKnot : GeomRow
+{
+    public DistanceCell X = new();
+    public DistanceCell Y = new();
+    public StringCell A = new();
+
+    public override void AddToElement(SXL.XElement parent, int index)
+    {
+        var el = XMLUtil.CreateVisioSchema2003Element("SplineKnot");
+        el.SetAttributeValueInt("IX", index);
+        el.Add(this.X.ToXml("X"));
+        el.Add(this.Y.ToXml("Y"));
+        el.Add(this.A.ToXml("A"));
+        parent.Add(el);
     }
 }

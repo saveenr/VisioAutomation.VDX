@@ -1,40 +1,35 @@
 using System.Collections.Generic;
-using VA=VisioAutomation;
 using System.Collections;
 
-namespace VisioAutomation.VDX.Elements
+namespace VisioAutomation.VDX.Elements;
+
+public class CustomProps : IEnumerable<CustomProp>
 {
-    public class CustomProps : IEnumerable<CustomProp>
+    private readonly List<CustomProp> items;
+
+    public CustomProps()
     {
-        private readonly List<CustomProp> items;
+        this.items = new List<CustomProp>();
+    }
 
-        public CustomProps()
+    public IEnumerator<CustomProp> GetEnumerator()
+    {
+        foreach (var i in this.items)
         {
-            this.items = new List<CustomProp>();
+            yield return i;
         }
+    }
 
-        public IEnumerator<CustomProp> GetEnumerator()
-        {
-            foreach (var i in this.items)
-            {
-                yield return i;
-            }
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
+    }
 
-        IEnumerator IEnumerable.GetEnumerator()     
-        {                                           
-            return this.GetEnumerator();
-        }
+    public int Count => this.items.Count;
 
-        public int Count
-        {
-            get { return this.items.Count;  }
-        }
-
-        public void Add( CustomProp cp)
-        {
-            cp.ID = this.items.Count + 1;
-            this.items.Add(cp);
-        }
+    public void Add(CustomProp cp)
+    {
+        cp.ID = this.items.Count + 1;
+        this.items.Add(cp);
     }
 }

@@ -9,6 +9,14 @@
 
 Keep serialization rules in the library, not in tools or tests. Introduce shared helpers when they remove concrete duplication; do not couple this independent file generator to the COM automation library.
 
+## Tooling and portability
+
+`VisioAutomationVDX.slnx` contains only the four projects and shared configuration files. SDK-style project files use central package versions and downloaded framework reference assemblies. C# 13 syntax does not change the net452/net472 runtime targets. The .NET 9 SDK is selected by `global.json`.
+
+The default template is a single named embedded XML resource, loaded lazily using framework APIs. The duplicate binary template, ResX wrappers, empty test resources, unused WinForms reference, legacy solution settings, and checked-in NuGet executable have been removed. XML fixtures no longer carry personal creator metadata or absolute Office/stencil paths.
+
+Public types, members, assembly versions, and COM visibility/GUID metadata are preserved. Empty assembly attributes and generated boilerplate are removed. Package authorship uses a project-level contributor label; copyright/license attribution and valid hosting URLs are intentionally retained until a repository transfer supplies replacement URLs.
+
 ## Model and serialization
 
 `Template` validates a Visio 2003 XML root, retains master/resources, and removes template pages and window state. Missing optional containers are created. Masters retain their original XML; the model records their IDs and subshape counts for generated shapes.
@@ -31,6 +39,8 @@ Public API spellings, including historical `GetMasterMetData(int)`, are retained
 
 ## Handover evidence
 
-Local verification on 2026-09-29: VS 2022 Debug and Release builds; 21 pure tests pass in both configurations, and 6 integration-project tests (5 use real Visio) pass in Release on x64 Visio 16.0.20326.20158. The original regression baseline had 14 failures among 17 tests. Evidence is under ignored `TestResults`; see [BUILDING.md](BUILDING.md) to reproduce it.
+Local verification on 2026-09-29: VS 2022 Debug and Release builds; 23 pure tests pass in both configurations, and 6 integration-project tests (5 use real Visio) pass in Release on x64 Visio 16.0.20326.20158. The original regression baseline had 14 failures among 17 tests. Evidence is under ignored `TestResults`; see [BUILDING.md](BUILDING.md) to reproduce it.
+
+Modernization verification also compared 829 public/protected type/member signatures and enum constants against the pre-modernization DLL with no differences. A source-only export restored from nuget.org into an empty package directory, built all four projects, and passed all 23 pure tests without the original checkout's build outputs. XML comparison confirmed that fixture changes were limited to the intended metadata removal.
 
 This is not an exhaustive schema/API audit, a multi-version Visio certification, or a completed ownership transfer. Confirm GitHub administration, NuGet package ownership, release credentials, and the minimum-runtime/version decision with the incoming maintainer. Hosted CI execution and external publishing access need separate verification.

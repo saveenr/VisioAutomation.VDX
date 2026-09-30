@@ -1,9 +1,8 @@
-namespace VisioAutomation.VDX.Enums
+namespace VisioAutomation.VDX.Enums;
+
+public enum ConLineJumpDirY
 {
-    public enum ConLineJumpDirY
-    {
-        Default = 0,
-        Left = 1,
-        Right = 2
-    }
+    Default = 0,
+    Left = 1,
+    Right = 2
 }

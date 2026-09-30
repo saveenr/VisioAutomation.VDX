@@ -1,8 +1,7 @@
-namespace VisioAutomation.VDX.Enums
+namespace VisioAutomation.VDX.Enums;
+
+public enum ShapeSplittable
 {
-    public enum ShapeSplittable
-    {
-        None = 0,
-        Allow = 1
-    }
+    None = 0,
+    Allow = 1
 }

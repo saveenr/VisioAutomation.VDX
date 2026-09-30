@@ -1,10 +1,9 @@
-namespace VisioAutomation.VDX.ShapeSheet
+namespace VisioAutomation.VDX.ShapeSheet;
+
+public class IntCell : CellScalar<int>
 {
-    public class IntCell : CellScalar<int>
+    public IntCell()
+        : base(CellUnit.None)
     {
-        public IntCell()
-            : base(CellUnit.None)
-        {
-        }
     }
 }

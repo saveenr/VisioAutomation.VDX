@@ -1,29 +1,25 @@
 using VisioAutomation.VDX.Internal;
 using SXL = System.Xml.Linq;
 
-namespace VisioAutomation.VDX.Elements
+namespace VisioAutomation.VDX.Elements;
+
+public class Window
 {
-    public class Window
+    private static readonly IDGenerator idgen = new(0);
+
+    private readonly int _id;
+    public int? Width { get; set; }
+    public int? Height { get; set; }
+
+    protected Window()
     {
-        private static readonly IDGenerator idgen = new IDGenerator(0);
+        this._id = Window.idgen.GetNextID();
+    }
 
-        private readonly int _id;
-        public int? Width { get; set; }
-        public int? Height { get; set; }
+    public int ID => this._id;
 
-        protected Window()
-        {
-            this._id = Window.idgen.GetNextID();
-        }
-
-        public int ID
-        {
-            get { return this._id; }
-        }
-
-        public virtual void AddToElement(SXL.XElement parent)
-        {
-            throw new System.Exception();
-        }
+    public virtual void AddToElement(SXL.XElement parent)
+    {
+        throw new System.Exception();
     }
 }
