@@ -12,8 +12,8 @@ permissions:
 
 jobs:
   build:
-    # Keep the hosted toolchain aligned with the documented VS 2022 baseline.
-    runs-on: windows-2022
+    # Match VisioAutomation's explicit toolchain instead of a moving runner alias.
+    runs-on: windows-2025-vs2026
     strategy:
       fail-fast: false
       matrix:
@@ -22,10 +22,10 @@ jobs:
       - uses: actions/checkout@v7
       - uses: microsoft/setup-msbuild@v3
         with:
-          vs-version: '[17.14,18.0)'
+          vs-version: '[18.0,19.0)'
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '9.0.x'
+          global-json-file: global.json
       - name: Check repository portability
         shell: powershell
         run: .\scripts\Test-Repository.ps1
@@ -37,8 +37,8 @@ jobs:
         shell: powershell
         run: |
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -version '[17.14,18.0)' -products '*' -requires Microsoft.Component.MSBuild -latest -property installationPath
-          if (-not $vs) { throw 'Visual Studio 2022 was not found.' }
+          $vs = & $vswhere -version '[18.0,19.0)' -products '*' -requires Microsoft.Component.MSBuild -latest -property installationPath
+          if (-not $vs) { throw 'Visual Studio 2026 was not found.' }
           $vstest = Join-Path $vs 'Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'
           & $vstest 'TestVisioAutomationVDX.Unit\bin\${{ matrix.configuration }}\TestVisioAutomationVDX.Unit.dll' /Platform:x64 '/Logger:trx;LogFileName=unit.trx' /ResultsDirectory:TestResults
           if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed.' }

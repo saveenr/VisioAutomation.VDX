@@ -11,7 +11,7 @@ Keep serialization rules in the library, not in tools or tests. Introduce shared
 
 ## Tooling and portability
 
-`VisioAutomationVDX.slnx` contains only the four projects and shared configuration files. SDK-style project files use central package versions and downloaded framework reference assemblies. C# 13 syntax does not change the net452/net472 runtime targets. The .NET 9 SDK is selected by `global.json`.
+`VisioAutomationVDX.slnx` contains only the four projects and shared configuration files. SDK-style project files use central package versions and downloaded framework reference assemblies. The shared VisioAutomation/VDX build baseline is VS 2026, the .NET 10 SDK selected by `global.json`, and explicit C# 14. This does not change the net452/net472 runtime targets or introduce a sibling-checkout dependency.
 
 The default template is a single named embedded XML resource, loaded lazily using framework APIs. The duplicate binary template, ResX wrappers, empty test resources, unused WinForms reference, legacy solution settings, and checked-in NuGet executable have been removed. XML fixtures no longer carry personal creator metadata or absolute Office/stencil paths.
 
@@ -38,6 +38,8 @@ These are mutable builder objects, not thread-safe documents. Use one builder pe
 Public API spellings, including historical `GetMasterMetData(int)`, are retained. Avoid renaming public members or tightening behavior without tests and a compatibility note.
 
 ## Handover evidence
+
+The aligned toolchain was also verified with VS 2026 and SDK 10.0.401: Debug and Release rebuilds, all 23 pure tests in each configuration, and all 6 integration-project tests in Release passed. Portability and C# style checks passed, Release packaging succeeded, and no Visio processes remained after the completed runs. Evidence is in `TestResults/aligned-*.log` and `TestResults/aligned-*.trx`. The earlier VS 2022 results below remain historical evidence.
 
 Local verification on 2026-09-29: VS 2022 Debug and Release builds; 23 pure tests pass in both configurations, and 6 integration-project tests (5 use real Visio) pass in Release on x64 Visio 16.0.20326.20158. The original regression baseline had 14 failures among 17 tests. Evidence is under ignored `TestResults`; see [BUILDING.md](BUILDING.md) to reproduce it.
 

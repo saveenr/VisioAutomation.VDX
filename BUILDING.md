@@ -1,6 +1,6 @@
 # Building and testing
 
-Run commands from this repository's root on Windows with Visual Studio 2022 17.14 or newer (within VS 2022), or matching Build Tools and the .NET desktop build workload. Install the .NET 9 SDK (9.0.300 or a later 9.0 feature band); `global.json` selects the latest installed 9.0 feature band. NuGet access is required for the first restore.
+Run commands from this repository's root on Windows with Visual Studio 2026 (or matching Build Tools) and the .NET desktop build workload. Install the .NET 10 SDK; `global.json` selects the latest installed stable 10.0 feature band, starting at 10.0.100. NuGet access is required for the first restore. This is the same build-tool baseline as VisioAutomation; it does not retarget the library to .NET 10.
 
 The library and font tool target **.NET Framework 4.5.2**; both test projects target **4.7.2**, matching VisioAutomation. Reference-assembly packages supply the targeting packs. You do not need Visio to build or run the pure unit tests. This alignment does not imply a new Microsoft support guarantee for these legacy targets.
 
@@ -8,35 +8,36 @@ The library and font tool target **.NET Framework 4.5.2**; both test projects ta
 
 ```powershell
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-$vs = & $vswhere -version '[17.14,18.0)' -products '*' -requires Microsoft.Component.MSBuild -latest -property installationPath
-if (-not $vs) { throw 'Visual Studio 2022 was not found.' }
+$vs = & $vswhere -version '[18.0,19.0)' -products '*' -requires Microsoft.Component.MSBuild -latest -property installationPath
+if (-not $vs) { throw 'Visual Studio 2026 was not found.' }
 $msbuild = Join-Path $vs 'MSBuild\Current\Bin\MSBuild.exe'
-& $msbuild VisioAutomationVDX.slnx -restore -p:Configuration=Release '-p:Platform=Any CPU' -m
+& $msbuild VisioAutomationVDX.slnx -restore -p:Configuration=Debug -m
 if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
 ```
 
 The canonical solution is `VisioAutomationVDX.slnx`; the legacy SLN and its project-skipping platform mappings have been removed. Both Debug and Release build all four projects as Any CPU.
 
-The minimum VS version follows [Microsoft's SLNX tooling support](https://devblogs.microsoft.com/dotnet/introducing-slnx-support-dotnet-cli/). Keep checkout and package-cache paths reasonably short: legacy Windows tooling can still hit path-length limits when framework reference assemblies are restored into deeply nested directories.
+The compiler/SDK baseline is separate from [SLNX format support](https://devblogs.microsoft.com/dotnet/introducing-slnx-support-dotnet-cli/). Keep checkout and package-cache paths reasonably short: legacy Windows tooling can still hit path-length limits when framework reference assemblies are restored into deeply nested directories.
 
-Use `Debug` for development. Outputs remain in `bin\Debug` and `bin\Release`. Dependencies are centralized in [Directory.Packages.props](Directory.Packages.props).
+Use `Debug` for development and `-p:Configuration=Release` for shipping artifacts. Outputs remain in `bin\Debug` and `bin\Release`, without a target-framework suffix. Dependencies are centralized in [Directory.Packages.props](Directory.Packages.props). In a VS 2026 Developer Command Prompt, `msbuild` is already on PATH. Opening the SLNX in VS 2026 also works.
 
 ## Pure tests
 
 ```powershell
 $vstest = Join-Path $vs 'Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'
-& $vstest TestVisioAutomationVDX.Unit\bin\Release\TestVisioAutomationVDX.Unit.dll /Platform:x64 '/Logger:trx;LogFileName=unit.trx' /ResultsDirectory:TestResults
+$configuration = 'Debug' # Use Release after building shipping artifacts.
+& $vstest "TestVisioAutomationVDX.Unit\bin\$configuration\TestVisioAutomationVDX.Unit.dll" /Platform:x64 '/Logger:trx;LogFileName=unit.trx' /ResultsDirectory:TestResults
 if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed.' }
 ```
 
-[CI](.github/workflows/build.yml) uses the `windows-2022` image with VS 2022, builds all four projects in Debug and Release, and runs the pure tests. Hosted runners do not run Visio integration tests. The image is explicit because `windows-latest` can move to a different Visual Studio generation.
+[CI](.github/workflows/build.yml) uses the `windows-2025-vs2026` image with VS 2026 and the SDK selected in `global.json`, matching VisioAutomation. It builds all four projects in Debug and Release and runs the pure tests. Hosted runners do not run Visio integration tests. The image is explicit because `windows-latest` can move to a different Visual Studio generation.
 
 ## Visio integration tests
 
 Use installed, activated Visio in an interactive Windows session. Save personal Visio work first. Tests create their own application and temporary files; cleanup runs even on assertion failures. Do not use parallel test execution.
 
 ```powershell
-& $vstest TestVisioAutomationVDX\bin\Release\TestVisioAutomationVDX.dll /Platform:x64 '/Logger:trx;LogFileName=integration.trx' /ResultsDirectory:TestResults
+& $vstest "TestVisioAutomationVDX\bin\$configuration\TestVisioAutomationVDX.dll" /Platform:x64 '/Logger:trx;LogFileName=integration.trx' /ResultsDirectory:TestResults
 if ($LASTEXITCODE -ne 0) { throw 'Integration tests failed.' }
 ```
 
@@ -70,6 +71,6 @@ Packaging is not publishing. The checked-in version remains 1.1.3 for local veri
 dotnet format style VisioAutomationVDX.slnx --no-restore --diagnostics IDE0005 IDE0161 IDE0090 IDE0025 --severity info --verify-no-changes
 ```
 
-C# 13 is selected explicitly, independently of the .NET Framework runtime targets. The checked-in style rules favor file-scoped namespaces, target-typed construction, compact single-line properties, and removal of unused imports. Avoid newer runtime-only APIs when modernizing syntax.
+C# 14 is selected explicitly, independently of the .NET Framework runtime targets. The checked-in style rules favor file-scoped namespaces, target-typed construction, compact single-line properties, and removal of unused imports. Avoid newer runtime-only APIs when modernizing syntax.
 
 `NuGet.config` clears machine-local feeds and uses nuget.org. All source/resource references are repository-relative; no sibling checkout is required. The repository check rejects missing/external build inputs and machine-specific file references inside fixtures. A fresh source export with an empty package directory should restore and build without existing `bin`, `obj`, or private feeds.

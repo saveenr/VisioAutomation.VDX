@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <!-- Fixed language version keeps VS 2022 and newer SDKs on the same syntax. -->
-    <LangVersion>13.0</LangVersion>
+    <!-- Shared toolchain baseline with VisioAutomation: VS 2026 and the .NET 10 SDK. -->
+    <LangVersion>14.0</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
