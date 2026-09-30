@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Changed
+- Assembly metadata is SDK-generated with shared defaults. Shipping identity remains 1.0.0.0; file versions track the package version and informational versions include the source commit. All four projects have complete metadata and explicit COM invisibility; existing GUIDs and copyright notices are preserved.
 - Adopted SLNX, C# 13, and explicit .NET 9 SDK selection; removed stale solution configurations and assembly boilerplate without changing public API or runtime targets.
 - Replaced duplicated ResX template resources with one embedded XML resource. Removed the vendored NuGet executable, unused test resources, and unnecessary WinForms reference.
 - Removed personal template metadata and absolute Office/stencil paths from fixtures. Package authorship now uses a project-level contributor label; license attribution and hosting links remain intact.

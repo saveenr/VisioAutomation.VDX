@@ -33,6 +33,9 @@ jobs:
         run: msbuild VisioAutomationVDX.slnx -restore -p:Configuration=${{ matrix.configuration }} "-p:Platform=Any CPU" -m
       - name: Check C# style
         run: dotnet format style VisioAutomationVDX.slnx --no-restore --diagnostics IDE0005 IDE0161 IDE0090 IDE0025 --severity info --verify-no-changes
+      - name: Verify assembly metadata
+        shell: powershell
+        run: .\scripts\Test-AssemblyMetadata.ps1 -Solution VisioAutomationVDX.slnx -PackageMetadata NuGet\VisioAutomation.VDX.nuspec -Configuration ${{ matrix.configuration }}
       - name: Test without Visio
         shell: powershell
         run: |

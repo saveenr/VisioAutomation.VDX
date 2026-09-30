@@ -15,7 +15,7 @@ Keep serialization rules in the library, not in tools or tests. Introduce shared
 
 The default template is a single named embedded XML resource, loaded lazily using framework APIs. The duplicate binary template, ResX wrappers, empty test resources, unused WinForms reference, legacy solution settings, and checked-in NuGet executable have been removed. XML fixtures no longer carry personal creator metadata or absolute Office/stencil paths.
 
-Public types, members, assembly versions, and COM visibility/GUID metadata are preserved. Empty assembly attributes and generated boilerplate are removed. Package authorship uses a project-level contributor label; copyright/license attribution and valid hosting URLs are intentionally retained until a repository transfer supplies replacement URLs.
+Public types, members, shipping assembly identity versions, and COM visibility/GUID metadata are preserved. The SDK generates descriptive metadata, release-specific file versions, and informational versions with Git commits. The new unit-test assembly now has complete metadata and explicit COM invisibility. Package authorship uses a project-level contributor label; copyright/license attribution and valid hosting URLs are intentionally retained until a repository transfer supplies replacement URLs.
 
 ## Model and serialization
 

@@ -3,7 +3,17 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <!-- Shared toolchain baseline with VisioAutomation: VS 2026 and the .NET 10 SDK. -->
     <LangVersion>14.0</LangVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- Release stamps are checked against the nuspec in CI. -->
+    <VersionPrefix>1.1.3</VersionPrefix>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Authors>VisioAutomation contributors</Authors>
+    <Company>$(Authors)</Company>
+    <AssemblyTitle>$(MSBuildProjectName)</AssemblyTitle>
+    <Product>$(MSBuildProjectName)</Product>
+    <Copyright>Copyright 2016 Saveen Reddy</Copyright>
+    <RepositoryUrl>https://github.com/saveenr/VisioAutomation.VDX</RepositoryUrl>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 </Project>

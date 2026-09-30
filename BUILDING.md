@@ -21,6 +21,19 @@ The compiler/SDK baseline is separate from [SLNX format support](https://devblog
 
 Use `Debug` for development and `-p:Configuration=Release` for shipping artifacts. Outputs remain in `bin\Debug` and `bin\Release`, without a target-framework suffix. Dependencies are centralized in [Directory.Packages.props](Directory.Packages.props). In a VS 2026 Developer Command Prompt, `msbuild` is already on PATH. Opening the SLNX in VS 2026 also works.
 
+## Assembly metadata
+
+The SDK generates descriptive and version attributes from `Directory.Build.props` and project properties, matching VisioAutomation. Source attributes retain COM visibility, existing GUIDs, and test parallelization controls. Copyright notices are preserved.
+
+All four assemblies use identity version `1.0.0.0`; file versions use the three-part `VersionPrefix` plus a zero revision. Informational versions contain the package version and Git commit. Source archives without Git metadata have only the release version. A commit stamp does not assert that the working tree was clean.
+
+Update `VersionPrefix` in `Directory.Build.props` together with the nuspec when preparing a release. The current 1.1.3 version remains unchanged; no release is implied by the new metadata. CI rejects version drift, missing metadata, wrong configuration, changed identity, stale commit stamps, and COM exposure. Run the same check in a fresh Windows PowerShell process:
+
+```powershell
+powershell.exe -NoProfile -File scripts\Test-AssemblyMetadata.ps1 -Solution VisioAutomationVDX.slnx -PackageMetadata NuGet\VisioAutomation.VDX.nuspec -Configuration Release
+if ($LASTEXITCODE -ne 0) { throw 'Assembly metadata checks failed.' }
+```
+
 ## Pure tests
 
 ```powershell
