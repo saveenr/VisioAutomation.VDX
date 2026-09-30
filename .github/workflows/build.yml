@@ -19,11 +19,11 @@ jobs:
       matrix:
         configuration: [Debug, Release]
     steps:
-      - uses: actions/checkout@v4
-      - uses: microsoft/setup-msbuild@v2
+      - uses: actions/checkout@v7
+      - uses: microsoft/setup-msbuild@v3
         with:
           vs-version: '[17.14,18.0)'
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '9.0.x'
       - name: Check repository portability
@@ -44,7 +44,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed.' }
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-${{ matrix.configuration }}
           path: TestResults/*.trx
