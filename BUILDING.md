@@ -29,7 +29,7 @@ $vstest = Join-Path $vs 'Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstes
 if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed.' }
 ```
 
-[CI](.github/workflows/build.yml) builds all four projects in Debug and Release and runs the pure tests. Hosted runners do not run Visio integration tests.
+[CI](.github/workflows/build.yml) uses the `windows-2022` image with VS 2022, builds all four projects in Debug and Release, and runs the pure tests. Hosted runners do not run Visio integration tests. The image is explicit because `windows-latest` can move to a different Visual Studio generation.
 
 ## Visio integration tests
 

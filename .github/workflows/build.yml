@@ -12,7 +12,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    # Keep the hosted toolchain aligned with the documented VS 2022 baseline.
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
